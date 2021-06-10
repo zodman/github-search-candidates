@@ -2,7 +2,7 @@ fastapi[all]
 jinja2
 httpx
 aiocsv
-aiofiles
+aiofiles~=0.7
 
 # tools
 click
