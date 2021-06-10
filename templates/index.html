@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Github Search Candidate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/alpine-collective/alpine-magic-helpers@1.2.x/dist/index.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
+  </head>
+  <body>
+    <section class="section">
+      <div class="container" x-data="{ url: '/search', s:'', location:'', response:[], inprogress:false, error:false}" x-init="$refs.query.focus()">
+        <h1 class="title">Github search candidates</h1>
+        <div class="field is-horizontal">
+          <input class="input" type="text" x-model="s" placeholder="Python developer" x-ref="query">
+          <input class="input" type="text" x-model='location' placeholder="Mexico" />
+          <button class="button is-primary" @click="inprogress=true; response=[]; fetch(url+'?s='+s+'&location='+location).then(r=>r.json()).then((r)=>{ response=r.results; inprogress=false; }).catch(e=>{ error=true; })">Send</button>
+          <br>
+
+        </div>
+        <span x-show="error"> Error sorry ...</span>
+        <progress class="progress is-small is-primary" x-show="inprogress"></progress>
+
+        <template x-if="response.length>0">
+          <div>
+            Results: <span x-text="response.length"></span>/500
+            <div class="table-container">
+              <table class="table is-fullwidth">
+                <thead>
+                  <tr>
+                    <th>Index</th>
+                    <th>pictur</th>
+                    <th>Name</th>
+                    <th>bio</th>
+                    <th>Email</th>
+                    <th>Github</th>
+                    <th>Location</th>
+                    <th>Hireable</th>
+                    <th>Company</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(r, index) in response" :key="index">
+                    <tr>
+                      <td>
+                        <span x-text="index"></span>
+                      </td>
+                      <td>
+                        <img class="image is-24x24" x-bind:src="r.avatar_url" alt=""/>
+                      </td>
+                      <td x-text="r.name"></td>
+                      <td x-text="r.bio"></td>
+                      <td x-text="r.email"></td>
+                      <td x-text="r.html_url"></td>
+                      <td x-text="r.location"></td>
+                      <td x-text="r.hireable"></td>
+                      <td x-text="r.company"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </template>
+      </div>
+      <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+          <strong>Made</strong> by <a href="https://linkedin.com/in/zodman">zodman</a>.
+          </p>
+          <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/zodman/github-search-candidates?style=social">
+        </div>
+      </footer>
+    </section>
+  </body>
+</html>

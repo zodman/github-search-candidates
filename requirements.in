@@ -1,0 +1,9 @@
+fastapi[all]
+jinja2
+httpx
+
+# tools
+click
+easyconf
+diskcache
+

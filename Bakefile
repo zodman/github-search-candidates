@@ -1,0 +1,11 @@
+VENV=.venv/bin/activate
+watch:
+    watchexec --watch static/src/** yarn run build
+
+run: @interactive
+    source ${VENV}
+    uvicorn app:app --reload
+
+initdb:
+    source ${VENV}
+    python -m db.database --help
