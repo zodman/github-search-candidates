@@ -1,6 +1,8 @@
 fastapi[all]
 jinja2
 httpx
+aiocsv
+aiofiles==0.7.0
 
 # tools
 click

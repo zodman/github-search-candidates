@@ -15,7 +15,8 @@
         <div class="field is-horizontal">
           <input class="input" type="text" x-model="s" placeholder="Python developer" x-ref="query">
           <input class="input" type="text" x-model='location' placeholder="Mexico" />
-          <button class="button is-primary" @click="inprogress=true; response=[]; fetch(url+'?s='+s+'&location='+location).then(r=>r.json()).then((r)=>{ response=r.results; inprogress=false; }).catch(e=>{ error=true; })">Send</button>
+          <button class="button is-primary" @click="inprogress=true; response=[]; fetch(url+'?s='+s+'&location='+location+'&csv=').then(r=>r.json()).then((r)=>{ response=r.results; inprogress=false; }).catch(e=>{ error=true; })">Send</button>
+          <button class="button" @click="window.location=url+'?s='+s+'&location='+location+'&csv=1'" x-show="response.length>0">download</button>
           <br>
 
         </div>
@@ -25,14 +26,12 @@
         <template x-if="response.length>0">
           <div>
             Results: <span x-text="response.length"></span>/500
-            <div class="table-container">
+            <div class="table-container box">
               <table class="table is-fullwidth">
                 <thead>
                   <tr>
                     <th>Index</th>
-                    <th>pictur</th>
-                    <th>Name</th>
-                    <th>bio</th>
+                    <th>Info</th>
                     <th>Email</th>
                     <th>Github</th>
                     <th>Location</th>
@@ -47,12 +46,22 @@
                         <span x-text="index"></span>
                       </td>
                       <td>
-                        <img class="image is-24x24" x-bind:src="r.avatar_url" alt=""/>
+                        <div class="media">
+                          <figure class="media-left">
+                            <img class="image is-24x24" x-bind:src="r.avatar_url" alt=""/>
+                          </figure>
+                          <div class="media-content">
+                            <div class="content">
+                              <strong class="is-size-6" x-text="r.name"> </strong>
+                              | <p x-text="r.bio" class="is-size-7" ></p>
+                            </div>
+                          </div>
+                        </div>
                       </td>
-                      <td x-text="r.name"></td>
-                      <td x-text="r.bio"></td>
-                      <td x-text="r.email"></td>
-                      <td x-text="r.html_url"></td>
+                      <td x-text="r.email" class="is-size-7"></td>
+                      <td>
+                        <a x-bind:href="r.html_url">gh</a>
+                      </td>
                       <td x-text="r.location"></td>
                       <td x-text="r.hireable"></td>
                       <td x-text="r.company"></td>

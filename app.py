@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse as StreamResponse
 from config import USER, PAT, EXPIRE_CACHE
 from asyncdiskcache import AsyncCache
 import httpx
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+import aiofiles.tempfile
+from aiocsv import AsyncDictWriter
 
 
 app = FastAPI()
@@ -38,8 +40,31 @@ async def fetch(client, params):
     resp = resp.json()
     return resp
 
+import os
+
+async def csv_results(results, query):
+    filepath = None
+    headers = ["name", "bio", "email", "company", "html_url", "location", "hireable"]
+    def filterit(r):
+        keys = r.keys()
+        for k in list(keys):
+            if k not in headers:
+                r.pop(k, None)
+        return r
+    results = map(filterit, results)
+    async with aiofiles.tempfile.TemporaryDirectory() as d:
+        filepath = os.path.join(d, "out.csv")
+        async with aiofiles.open(filepath,mode="w", newline="", encoding="utf-8") as f:
+            writer = AsyncDictWriter(f, dialect="unix", fieldnames=headers)
+            await writer.writeheader()
+            await writer.writerows(results)
+            return StreamResponse(open(filepath), media_type="text/csv", 
+                                  headers={
+                                                  "Content-Disposition": f"attachment;filename={query}.csv"
+                                              })
+
 @app.get("/search")
-async def search(s: str, location:str):
+async def search(s: str, location:str, csv: str):
     await cache_search.initialize(directory='/tmp/diskcache/cache_user_async')
     client = httpx.AsyncClient()
     page=1
@@ -67,6 +92,8 @@ async def search(s: str, location:str):
     else:
         results = resp
     await client.aclose()
+    if csv !="":
+        return await csv_results(results, query)
     return {'results': results, 'total': len(results)}
 
 
