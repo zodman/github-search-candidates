@@ -15,6 +15,6 @@ def deploy(ctx):
     with ctx.cd(dest_dir):
         with ctx.prefix(f"source {dest_dir}/.env/bin/activate"):
             ctx.run("pip install -r requirements.txt")
-    ctx.run(f"sudo supervisorctl restart {app_name}")
+    ctx.run(f"sudo supervisorctl restart {app_name}:*")
 
 
